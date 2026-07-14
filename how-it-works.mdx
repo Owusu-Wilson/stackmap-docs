@@ -1,0 +1,84 @@
+---
+title: "How StackMap Discovers and Monitors Your Infrastructure"
+sidebarTitle: "How It Works"
+description: "A conceptual guide to how StackMap scans your domain, parses service credentials, assembles a live graph, and tracks expiry dates."
+---
+
+StackMap builds a living map of every service your application depends on. Rather than asking you to fill in a form, it gathers evidence from public signals — DNS records, WHOIS registries, SSL certificates — and combines that with any environment configuration you choose to share. The result is a graph that stays accurate as your infrastructure evolves.
+
+## Onboarding methods
+
+StackMap supports four ways to bring services into a project. Most users combine two or more of them to get comprehensive coverage.
+
+<CardGroup cols={2}>
+  <Card title="Domain Discovery" icon="magnifying-glass" href="/projects/domain-discovery">
+    Submit a root domain and StackMap automatically runs WHOIS lookups, DNS record resolution, and SSL certificate scans to find services without any manual input.
+  </Card>
+  <Card title=".env Parsing" icon="file-code" href="/projects/env-import">
+    Upload or paste your `.env` file. StackMap reads key names, identifies the provider behind each key, and maps those providers as service nodes.
+  </Card>
+  <Card title="OAuth Integrations (Coming Soon)" icon="plug" href="/projects/oauth-integrations">
+    Connect Cloudflare, Vercel, or GitHub accounts directly. StackMap will pull live resource lists from their APIs to populate nodes with verified account data. Available in Phase 2.
+  </Card>
+  <Card title="Manual Entry" icon="plus" href="/projects/manual-entry">
+    Add any service by hand by picking a provider type and entering the relevant details. Useful for internal services, databases behind a private network, or any provider not yet covered by automated discovery.
+  </Card>
+</CardGroup>
+
+## Domain discovery pipeline
+
+When you submit a domain, StackMap dispatches a set of background jobs. These jobs run independently and in parallel, so the full scan completes in seconds rather than minutes.
+
+### WHOIS lookup
+
+StackMap queries the authoritative WHOIS registry for your root domain to retrieve registrar details, registration date, and — most importantly — the expiry date. This expiry date is stored and monitored so StackMap can alert you before your domain lapses.
+
+### DNS record resolution
+
+StackMap resolves all major DNS record types — `A`, `AAAA`, `CNAME`, `MX`, `TXT`, and `NS` — against public resolvers. Each resolved value is passed to the fingerprint database (described below) to identify which provider or service it points to. For example, a `CNAME` pointing to `*.vercel.app` is matched to Vercel; an `MX` record pointing to Google's mail servers is matched to Google Workspace.
+
+### SSL certificate polling
+
+StackMap connects to your domain and any discovered subdomains over HTTPS to retrieve the active TLS certificate. It records the certificate authority, the issued-to common name, and the `notAfter` expiry date. This expiry date feeds directly into expiry tracking alongside the WHOIS registration date.
+
+## Service fingerprinting
+
+Raw DNS and certificate data only tells you *what* a record says — the fingerprint database tells you *what service* it represents. StackMap maintains a curated database of provider signatures: hostname patterns, ASN ranges, TXT record prefixes, and certificate issuer strings that uniquely identify well-known cloud providers, CDNs, email services, analytics platforms, and more.
+
+When a resolved record matches a fingerprint, StackMap creates a corresponding service node and labels it with the provider's name, logo, and category. Unmatched records are surfaced as generic nodes so you can manually assign them to a provider if needed.
+
+## How the graph is assembled
+
+Once all background jobs finish, StackMap assembles the graph by translating discovered data into nodes and edges.
+
+**Nodes** represent individual services. Each node carries:
+
+- The provider logo and display name
+- Service type (e.g. DNS, hosting, email, analytics)
+- Linked account or identifier where available
+- Current operational status
+- Expiry date, if applicable
+
+**Edges** represent detected relationships between services. A relationship is inferred when one service directly references another — for instance, when your domain's `A` record resolves to an IP range owned by Cloudflare, an edge is drawn between the domain node and the Cloudflare node. Edges give you a clear picture of how services depend on each other, making it easier to reason about the blast radius of an outage or a migration.
+
+The graph is rendered as an interactive canvas. You can drag nodes to create a layout that matches your mental model, zoom in to inspect a single service cluster, or zoom out to see the full picture.
+
+## Expiry tracking
+
+Infrastructure expiry is easy to miss. Domain registrations renew annually, TLS certificates expire every 90 days or 12 months depending on the issuer, and API keys or OAuth tokens often carry their own expiry windows.
+
+StackMap tracks expiry dates from three sources:
+
+1. **WHOIS data** — domain registration expiry
+2. **SSL certificate polling** — TLS certificate `notAfter` date
+3. **Manual entry** — expiry dates you provide when adding a service by hand
+
+Scheduled background checks re-poll these sources at regular intervals to detect renewals and catch any changes. When a service's expiry date falls within a configurable alert window, StackMap generates an alert that appears on the service node in the graph and in your project's alerts feed.
+
+<Note>
+  **How .env parsing protects your secrets.** When you submit a `.env` file, all parsing happens locally in your browser — the raw file is never uploaded. StackMap's client-side parser extracts only the *key name* (e.g. `STRIPE_SECRET_KEY`) and uses it to infer the provider (e.g. Stripe). The corresponding value is discarded immediately and is never transmitted to StackMap's servers. You get full service discovery without exposing credentials.
+</Note>
+
+## What's coming next
+
+StackMap's current release covers domain discovery, .env parsing, manual entry, graph visualisation, and expiry tracking. Upcoming phases will add OAuth integrations with Cloudflare, Vercel, and GitHub for verified live-data nodes, followed by cost tracking and team collaboration features. See the [FAQ](/faq) for more details on the roadmap.

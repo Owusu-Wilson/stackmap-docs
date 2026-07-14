@@ -1,0 +1,75 @@
+---
+title: "Start Mapping Your Infrastructure with StackMap in Minutes"
+sidebarTitle: "Quickstart"
+description: "Set up your first StackMap project, run domain discovery, and explore a live interactive graph of every service your app depends on."
+---
+
+StackMap turns your app's infrastructure into a live, interactive graph — no agents to install, no manual inventory spreadsheets. The fastest way to get started is domain discovery: give StackMap your domain and it automatically scans DNS records, WHOIS data, and SSL certificates to build your first graph.
+
+<Steps>
+
+  <Step title="Create your account">
+    Go to [app.stackmap.io](https://app.stackmap.io) and sign up. You can register with an email address or continue with Google. Once you confirm your email, you land on your empty project dashboard.
+  </Step>
+
+  <Step title="Create a new project">
+    Click **New Project** in the top-right corner. Enter a project name that matches the app you want to map — for example, `acme-production` or `my-saas-app`. Your project name is only visible to you and is used to organise multiple graphs in your dashboard.
+  </Step>
+
+  <Step title="Choose an onboarding method">
+    StackMap gives you three ways to populate your graph today. Select **Domain Discovery** for the fastest results.
+
+    <CardGroup cols={3}>
+      <Card title="Domain Discovery" icon="magnifying-glass" href="/projects/domain-discovery">
+        Enter your root domain (e.g. `acme.io`). StackMap runs WHOIS, DNS, and SSL scans automatically in the background. **Recommended for first-time setup.**
+      </Card>
+      <Card title=".env Parsing" icon="file-code" href="/projects/env-import">
+        Paste or upload your `.env` file. StackMap detects provider key names and maps them as service nodes. Secret values never leave your browser.
+      </Card>
+      <Card title="Manual Entry" icon="plus" href="/projects/manual-entry">
+        Add any service by hand — choose a provider, enter account details, and place the node directly on the graph. Useful for services with no public DNS footprint.
+      </Card>
+    </CardGroup>
+
+    <Tip>
+      **Your secrets stay on your device.** When you use .env parsing, StackMap processes the file entirely in your browser. Only key *names* and their detected provider are sent to StackMap's servers — secret values are stripped before anything leaves the page.
+    </Tip>
+  </Step>
+
+  <Step title="Wait for discovery to complete">
+    After you submit your domain, StackMap queues a background job that runs DNS record resolution, WHOIS lookups, and SSL certificate polling. This typically completes in **under 60 seconds** for most domains.
+
+    A progress indicator appears on the project screen. You don't need to keep the tab open — StackMap will finish the scan and the graph will be ready when you return.
+
+    <Info>
+      The number of services discovered depends on how many subdomains, DNS records, and referenced third-party providers are associated with your domain. Complex apps with many microservices or integrations may take a little longer.
+    </Info>
+  </Step>
+
+  <Step title="Explore your graph">
+    Once discovery finishes, click **Open Graph** to enter the interactive canvas. Every detected service appears as a node — drag nodes to rearrange the layout, scroll to zoom, and pan by clicking and dragging the canvas background.
+
+    A few things worth checking first:
+
+    - **Service cards** show each service's logo, type, linked account, and current status.
+    - **Edges** connect services that have a detected relationship (for example, a Vercel deployment pointing to a custom domain).
+    - **Expiry badges** flag any domain or SSL certificate that is approaching its renewal date.
+    - **Minimap** in the bottom-right corner gives you a bird's-eye view of your full graph.
+
+    <Note>
+      Don't see a service you know exists? Use **Add Service** in the graph toolbar to add it manually, or paste a `.env` file to pull in additional integrations.
+    </Note>
+  </Step>
+
+</Steps>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Graph Overview" icon="diagram-project" href="/graph/overview">
+    Learn how to navigate the canvas, customise node layout, and read relationship edges in your infrastructure graph.
+  </Card>
+  <Card title="Expiry Tracking & Alerts" icon="bell" href="/alerts/expiry-tracking">
+    Understand how StackMap monitors domain and SSL certificate expiry dates and how to configure alert thresholds.
+  </Card>
+</CardGroup>

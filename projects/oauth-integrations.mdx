@@ -1,0 +1,66 @@
+---
+title: "OAuth Integrations: Connect Cloudflare, Vercel, and GitHub"
+sidebarTitle: "OAuth"
+description: "Link your Cloudflare, Vercel, and GitHub accounts to stream live DNS records, deployments, and repos into your StackMap graph automatically."
+---
+
+OAuth integrations take StackMap from a point-in-time snapshot to a continuously updated infrastructure map. Instead of relying on DNS inference or environment variable key names, a connected provider grants StackMap read access to its API — so your graph reflects the actual live state of your zones, projects, and repositories at all times.
+
+<Note>
+  **OAuth integrations are a Phase 2 feature and are not yet available.** They are currently in development and will be released after the current Phase 1 launch. This page describes what each integration will do so you know what's coming. In the meantime, use [domain discovery](/projects/domain-discovery) or [.env import](/projects/env-import) to map your stack today.
+</Note>
+
+## Supported integrations
+
+<CardGroup cols={3}>
+  <Card title="Cloudflare" icon="cloud" href="/integrations/cloudflare">
+    Sync all zones and their DNS records directly from your Cloudflare account.
+  </Card>
+  <Card title="Vercel" icon="triangle" href="/integrations/vercel">
+    Pull in every Vercel project and its deployment history.
+  </Card>
+  <Card title="GitHub" icon="github" href="/integrations/github">
+    Connect your GitHub account to map repositories to the services they depend on.
+  </Card>
+</CardGroup>
+
+## What each integration will sync
+
+### Cloudflare
+
+When you connect your Cloudflare account, StackMap will import every zone associated with that account and populate your graph with its full DNS record set — A, AAAA, CNAME, MX, TXT, and NS records included. Records will stay in sync automatically as you make changes in Cloudflare. See [Cloudflare integration details](/integrations/cloudflare) for a full breakdown of synced fields.
+
+### Vercel
+
+Connecting Vercel will pull in all projects in your team or personal account, together with their deployment environments and associated domain aliases. StackMap will link each Vercel project node to other services it touches — for example, connecting it to a Cloudflare zone node if the domains overlap. See [Vercel integration details](/integrations/vercel) for more.
+
+### GitHub
+
+The GitHub integration will map repositories into your graph and associate them with the infrastructure services they reference. This gives you a code-to-infrastructure view: click a service node and see which repos depend on it, or start from a repo and explore its full dependency graph. See [GitHub integration details](/integrations/github) for more.
+
+## How the OAuth flow will work
+
+When OAuth integrations ship, connecting a provider will follow a standard authorization flow. You will be redirected to the provider's authorization page, grant StackMap read access, and be returned to your project with the integration active. The API endpoint that initiates the flow is:
+
+```
+GET /api/auth/oauth/{provider}
+```
+
+Where `{provider}` is one of `cloudflare`, `vercel`, or `github`. The dashboard **Connect** button for each integration will call this endpoint automatically — no manual API calls are required.
+
+## What to use in the meantime
+
+While OAuth integrations are in development, you can still build a comprehensive infrastructure graph using the Phase 1 tools:
+
+<CardGroup cols={2}>
+  <Card title="Domain Discovery" icon="magnifying-glass" href="/projects/domain-discovery">
+    Scan your domain with WHOIS, DNS, and SSL checks to auto-detect providers in minutes.
+  </Card>
+  <Card title=".env Import" icon="file-lines" href="/projects/env-import">
+    Upload your `.env` file to identify providers from key names — no secrets transmitted.
+  </Card>
+</CardGroup>
+
+<Tip>
+  You can combine domain discovery and `.env` import right now to get strong coverage across DNS-visible and credential-referenced services. Add anything remaining with manual entry, and your graph will be ready to enrich further once OAuth integrations ship.
+</Tip>

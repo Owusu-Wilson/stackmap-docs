@@ -1,0 +1,79 @@
+---
+title: "GitHub Integration — StackMap Repository Graph Mapping"
+sidebarTitle: "GitHub"
+description: "Sync your GitHub repositories into StackMap and link your code directly to the infrastructure and deployment services that run it."
+---
+
+The GitHub integration connects your GitHub account to StackMap via OAuth and syncs your repositories into your infrastructure graph. Once connected, StackMap adds repo nodes and links them to the deployment and hosting services that build and run your code — so you can trace any part of your infrastructure back to its source repository.
+
+<Info>
+  **Coming in Phase 2.** The GitHub integration is not yet available. This page describes what will be possible once it launches so you can plan ahead. In the meantime, see [Manual Entry](/projects/manual-entry) to add GitHub repositories to your graph today.
+</Info>
+
+## What the GitHub integration does
+
+When you connect GitHub, StackMap reads your repositories and maps them as nodes in your graph. StackMap then analyzes each repo's metadata to infer connections to deployment pipelines, hosting platforms, and other infrastructure nodes already in your graph. As you create new repositories or rename existing ones on GitHub, StackMap keeps your graph current automatically.
+
+## How to connect
+
+When the GitHub integration launches, connecting your account will take just a few steps. Here is what the process will look like.
+
+<Steps>
+  <Step title="Open Integration Settings">
+    Navigate to **Settings → Integrations** in your StackMap workspace.
+  </Step>
+  <Step title="Select GitHub">
+    Find the GitHub card and click **Connect**.
+  </Step>
+  <Step title="Authorize via OAuth">
+    You will be redirected to GitHub's authorization page. Sign in with the GitHub account or organization you want to connect and grant StackMap access to your repositories.
+  </Step>
+  <Step title="Choose repositories to sync">
+    Select whether to sync all repositories or only specific ones. You can adjust this selection at any time from the integration settings.
+  </Step>
+  <Step title="Confirm and sync">
+    Click **Save**. StackMap will perform an initial sync and add your repository nodes to your graph within a few seconds.
+  </Step>
+</Steps>
+
+## What gets synced
+
+StackMap will import the following data from GitHub:
+
+| Data type | Details |
+|---|---|
+| **Repository names** | The full name of each repository, including the owner prefix (e.g. `acme/api-server`) |
+| **Visibility** | Whether the repository is public or private |
+| **Primary language** | The dominant programming language GitHub detected for the repository |
+
+<Note>
+  StackMap requests read-only access to your repository metadata. It does not read source code, commit history, pull requests, or any other repository content.
+</Note>
+
+## How StackMap links repos to deployment and hosting services
+
+After importing your repositories, StackMap uses repo names and metadata to automatically draw edges to related infrastructure nodes. Common links StackMap infers include:
+
+- **Vercel project nodes** — A Vercel project connected to a GitHub repo gets linked to the corresponding repo node.
+- **CI/CD pipeline nodes** — Repositories matched to a known CI/CD service appear connected to that service's node.
+- **Hosting service nodes** — Repo names that match deployed application names get linked to their hosting or compute nodes.
+
+<Tip>
+  Connect your Vercel or other deployment integrations alongside GitHub to get the richest set of automatic connections between your code and your infrastructure.
+</Tip>
+
+## How to disconnect
+
+To remove the GitHub integration, go to **Settings → Integrations**, find the GitHub card, and click **Disconnect**. StackMap will stop syncing and revoke its OAuth access token. Existing repository nodes in your graph will remain but will no longer update automatically — you can delete them manually if needed.
+
+<Warning>
+  Disconnecting does not delete any nodes already in your graph. Remove them manually from your project if you no longer need them.
+</Warning>
+
+## In the meantime
+
+While the GitHub integration is in development, you can add your repositories to your graph as manual entries. Manual repo nodes support the same connections as synced nodes — you just update them by hand when repository details change.
+
+<Card title="Manual Entry" href="/projects/manual-entry">
+  Add a GitHub repository node by hand and connect it to deployment and hosting services in your graph.
+</Card>

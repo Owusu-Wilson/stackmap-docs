@@ -1,0 +1,75 @@
+---
+title: "Detect and Import Services from Your .env File in StackMap"
+sidebarTitle: ".env Import"
+description: "Detect providers from your environment variable key names — parsing stays in your browser and no secret values ever leave your device."
+---
+
+Your `.env` file is a map of every external service your app talks to. StackMap's `.env` import reads that file to identify providers from key names alone — things like `STRIPE_SECRET_KEY` pointing to Stripe or `SENDGRID_API_KEY` pointing to SendGrid — and adds them as nodes in your infrastructure graph. It works entirely without exposing your secrets.
+
+## Security model
+
+<Note>
+  **Your secrets never leave your browser.** All `.env` parsing happens client-side in JavaScript before any data is transmitted. StackMap strips everything after the `=` sign — the actual secret value — in the browser. Only the key names and the provider type detected from each key are sent to StackMap's servers. No credentials, tokens, or connection strings are stored or transmitted.
+</Note>
+
+## What StackMap detects
+
+StackMap matches key names against a database of well-known environment variable prefixes and patterns. Here are some examples of what it identifies:
+
+```dotenv
+# Payments
+STRIPE_SECRET_KEY=sk_live_...          # → Stripe
+STRIPE_PUBLISHABLE_KEY=pk_live_...     # → Stripe
+
+# Cloud
+AWS_ACCESS_KEY_ID=AKIA...              # → AWS
+AWS_SECRET_ACCESS_KEY=...              # → AWS
+GOOGLE_APPLICATION_CREDENTIALS=...    # → Google Cloud
+
+# Auth
+AUTH0_CLIENT_ID=...                    # → Auth0
+AUTH0_CLIENT_SECRET=...                # → Auth0
+CLERK_SECRET_KEY=...                   # → Clerk
+
+# Communication
+SENDGRID_API_KEY=SG....                # → SendGrid
+TWILIO_ACCOUNT_SID=AC...               # → Twilio
+
+# Monitoring
+SENTRY_DSN=https://...                 # → Sentry
+DATADOG_API_KEY=...                    # → Datadog
+```
+
+When multiple keys map to the same provider (e.g. both `STRIPE_SECRET_KEY` and `STRIPE_PUBLISHABLE_KEY`), StackMap deduplicates them into a single node.
+
+## Import your .env file
+
+<Steps>
+  <Step title="Open your project">
+    Navigate to the project you want to update in the StackMap dashboard.
+  </Step>
+  <Step title="Start the .env import">
+    Click **Add Services**, then select **.env Import** from the options panel.
+  </Step>
+  <Step title="Paste or upload your file">
+    Either paste the contents of your `.env` file directly into the text area, or click **Upload File** and select the file from your filesystem. Both methods trigger the same client-side parsing — nothing is sent until you confirm in the next step.
+  </Step>
+  <Step title="Review detected services">
+    StackMap displays a list of every provider it detected, along with the key names that triggered each match. Uncheck any service you don't want to add to your graph.
+  </Step>
+  <Step title="Confirm and add to graph">
+    Click **Add to Graph**. The selected services appear as nodes in your infrastructure graph immediately.
+  </Step>
+</Steps>
+
+<Tip>
+  You can run `.env` import multiple times — for example if you have separate `.env.local`, `.env.staging`, and `.env.production` files. StackMap merges new detections into the existing graph without creating duplicate nodes for providers already present.
+</Tip>
+
+## What to do if a provider isn't detected
+
+StackMap's key-name database covers hundreds of common prefixes, but custom or internal variable names may not match. If a service your app uses doesn't appear after import, add it directly using manual entry.
+
+<Card title="Manual Entry" icon="plus" href="/projects/manual-entry">
+  Add any service by hand — choose its provider type, fill in a name and notes, and save it to your graph in seconds.
+</Card>

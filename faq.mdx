@@ -1,0 +1,131 @@
+---
+title: "StackMap FAQ: Discovery, Graph, Security and Alerts"
+sidebarTitle: "FAQ"
+description: "Get answers to common StackMap questions covering discovery, .env file security, graph navigation, expiry alerts, and REST API access."
+---
+
+StackMap turns the tangled web of services your app depends on into a single, live infrastructure graph. Whether you're just getting started or looking to get more out of the platform, these answers cover the questions our users ask most often.
+
+## General
+
+<Accordion title="What is StackMap?">
+  StackMap is a SaaS tool that automatically discovers every service your application depends on and maps those dependencies into a live, interactive infrastructure graph. You can see your domains, third-party APIs, cloud providers, and more — all in one place — along with expiry dates and real-time status alerts.
+</Accordion>
+
+<Accordion title="Who is StackMap for?">
+  StackMap is built for developers, DevOps engineers, and engineering teams who want a clear picture of their app's infrastructure. It's especially useful for teams managing multiple projects with sprawling third-party dependencies, where losing track of a single expiring SSL certificate or API key can cause outages.
+</Accordion>
+
+<Accordion title="Is there a free trial?">
+  Yes — you can sign up and start mapping your first project at no cost. Visit the StackMap homepage to create an account and explore the platform before committing to a paid plan.
+</Accordion>
+
+## Security & Privacy
+
+<Accordion title="Is it safe to import my .env file?">
+  Absolutely. StackMap's `.env` parser runs entirely in your browser. Before anything leaves your device, the parser strips every secret value — the right-hand side of each `KEY=VALUE` pair. Only the key *names* and the detected provider type are sent to StackMap's servers. Your secrets never touch our infrastructure.
+
+  <Note>
+    Even if you close the browser tab mid-import, no secret values are transmitted. The stripping happens locally, before any network request is made.
+  </Note>
+</Accordion>
+
+<Accordion title="What data does StackMap actually store?">
+  StackMap stores:
+  - **Domain and DNS metadata** gathered during discovery (hostnames, record types, SSL expiry dates)
+  - **Environment variable key names** from `.env` imports (e.g., `STRIPE_SECRET_KEY`), never values
+  - **Detected provider type** associated with each key name (e.g., Stripe, AWS, SendGrid)
+  - **Service entries** you add manually, including any notes you provide
+
+  StackMap never stores raw secret values, passwords, or tokens.
+</Accordion>
+
+<Accordion title="Is my data encrypted?">
+  Yes. All data is encrypted in transit using TLS and encrypted at rest. StackMap follows industry-standard security practices to keep your project metadata safe.
+</Accordion>
+
+## Discovery
+
+<Accordion title="How accurate is domain discovery?">
+  Domain discovery uses WHOIS lookups, DNS record scanning, and SSL certificate inspection to identify services associated with your domain. It reliably surfaces services that have a DNS footprint — such as subdomains pointing to cloud providers, CDNs, or third-party platforms.
+
+  <Info>
+    Some services don't publish DNS records and won't appear in an automated scan. For those, use the `.env` import or add the service manually from the graph view.
+  </Info>
+</Accordion>
+
+<Accordion title="What DNS record types does StackMap scan?">
+  StackMap scans the following DNS record types during discovery:
+  - **A / AAAA** — IPv4 and IPv6 address records
+  - **CNAME** — canonical name aliases, often pointing to third-party providers
+  - **MX** — mail exchange records (used to detect email providers)
+  - **TXT** — text records, which frequently contain provider verification tokens
+  - **NS** — name server records
+
+  SSL certificates are also inspected for Subject Alternative Names (SANs), which can reveal additional subdomains.
+</Accordion>
+
+<Accordion title="How long does domain discovery take?">
+  Most scans complete within 30–60 seconds, depending on the number of subdomains and the responsiveness of external DNS servers. For very large domains with many subdomains or slow WHOIS servers, a scan may take a few minutes. You'll see a progress indicator in the project view, and the graph will update automatically once the scan finishes.
+</Accordion>
+
+## Graph
+
+<Accordion title="Can I rearrange nodes on the graph?">
+  Yes. Every node on the graph is draggable — just click and drag it to a new position. Your layout is saved automatically. If your graph becomes difficult to read, use the **Auto-layout** button in the toolbar to reset all nodes to a clean, algorithmically organized arrangement.
+
+  <Tip>
+    On large projects, zoom out and use the minimap in the bottom-right corner to navigate and spot clusters of related services quickly.
+  </Tip>
+</Accordion>
+
+<Accordion title="How do I add a service that wasn't detected automatically?">
+  From the graph view, click **Add Service** in the toolbar. Fill in the service name, type, and any relevant URLs or notes. The new node appears on the graph immediately and is included in future expiry tracking if you provide a domain or certificate endpoint.
+</Accordion>
+
+<Accordion title="Can I export the graph?">
+  Graph export is on the StackMap roadmap. In the meantime, you can take a screenshot of the full graph using your browser's built-in tools, or use the minimap to capture an overview of large projects.
+</Accordion>
+
+## Expiry & Alerts
+
+<Accordion title="How often does StackMap check expiry dates?">
+  StackMap re-scans SSL certificates and WHOIS records on a regular schedule (typically every 24 hours) for all active projects. You can also trigger a manual re-scan at any time from your project settings to get the freshest data immediately.
+</Accordion>
+
+<Accordion title="Can I receive email alerts before something expires?">
+  Yes. You can configure expiry alert thresholds in your project notification settings. StackMap will send you an email when a domain or SSL certificate is approaching expiry — by default at 30, 14, and 7 days out. You can customize these thresholds or add additional recipients from the **Alerts** tab in your project settings.
+</Accordion>
+
+<Accordion title="What should I do when something is about to expire?">
+  When StackMap flags an upcoming expiry, take action directly with the relevant provider:
+  - **SSL certificate** — renew through your certificate authority or, if you're using a managed provider like Cloudflare or AWS ACM, confirm auto-renewal is enabled.
+  - **Domain registration** — log in to your domain registrar and extend the registration period.
+  - **API key or service credential** — rotate the key in the provider's dashboard, then update your application's configuration.
+
+  Once you've renewed or rotated, re-trigger a StackMap scan from project settings so the graph reflects the updated expiry date.
+
+  <Warning>
+    Don't wait until the last day. SSL certificate propagation and domain renewal processing can take time. Act as soon as you receive the first alert.
+  </Warning>
+</Accordion>
+
+## API & Integrations
+
+<Accordion title="Does StackMap have an API?">
+  Yes — StackMap provides a REST API for programmatic access to your projects and data. Key endpoints include:
+
+  - **Creating and retrieving projects** — `POST /api/projects` and `GET /api/projects/{id}`
+  - **Triggering discovery scans** — `POST /api/projects/{id}/discover`
+  - **Managing services** — `POST /api/projects/{id}/services`, `GET /api/projects/{id}/services`, and `DELETE /api/projects/{id}/services/{serviceId}`
+  - **Querying and dismissing alerts** — `GET /api/alerts` and `PATCH /api/alerts/{id}/dismiss`
+  - **Authentication** — `POST /api/auth/login` and `POST /api/auth/logout`
+
+  Full API documentation is available for teams that want to automate infrastructure mapping, integrate StackMap into CI/CD pipelines, or build custom tooling on top of their project data.
+</Accordion>
+
+<Accordion title="Are OAuth integrations available?">
+  OAuth integrations with Cloudflare, Vercel, and GitHub are coming in Phase 2 and are not yet available. Once released, you'll be able to connect these accounts directly to StackMap for deeper, automated discovery.
+
+  In the meantime, you can achieve broad coverage using the three current discovery methods: domain discovery, `.env` import, and manual entry.
+</Accordion>

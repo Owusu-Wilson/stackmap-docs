@@ -1,0 +1,85 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "luma",
+  "name": "StackMap",
+  "colors": {
+    "primary": "#ef7025",
+    "light": "#eec9bc",
+    "dark": "#4fa1ab"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "index",
+              "quickstart",
+              "how-it-works"
+            ]
+          },
+          {
+            "group": "Adding Projects",
+            "pages": [
+              "projects/domain-discovery",
+              "projects/env-import",
+              "projects/manual-entry",
+              "projects/oauth-integrations"
+            ]
+          },
+          {
+            "group": "The Graph",
+            "pages": [
+              "graph/overview",
+              "graph/service-nodes",
+              "graph/navigating"
+            ]
+          },
+          {
+            "group": "Expiry & Alerts",
+            "pages": [
+              "alerts/expiry-tracking",
+              "alerts/notifications"
+            ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              "integrations/cloudflare",
+              "integrations/vercel",
+              "integrations/github"
+            ]
+          },
+          {
+            "group": "Help",
+            "pages": [
+              "faq",
+              "troubleshooting"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:support@stackmap.io"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Open App",
+      "href": "https://app.stackmap.io"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/stackmap"
+    }
+  }
+}

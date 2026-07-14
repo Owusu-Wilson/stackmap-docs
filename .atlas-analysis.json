@@ -1,0 +1,88 @@
+{
+  "projectType": "saas",
+  "projectName": "StackMap",
+  "projectDescription": "StackMap is a project-centric infrastructure graph that automatically discovers every service your app depends on and visualizes it as a live, interactive topology with expiry tracking and alerts.",
+  "theme": "luma",
+  "primaryColor": "#ef7025",
+  "lightColor": "#eec9bc",
+  "darkColor": "#4fa1ab",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "how-it-works"
+            ]
+          },
+          {
+            "group": "Adding Projects",
+            "pages": [
+              "projects/domain-discovery",
+              "projects/env-import",
+              "projects/manual-entry",
+              "projects/oauth-integrations"
+            ]
+          },
+          {
+            "group": "The Graph",
+            "pages": [
+              "graph/overview",
+              "graph/service-nodes",
+              "graph/navigating"
+            ]
+          },
+          {
+            "group": "Expiry & Alerts",
+            "pages": [
+              "alerts/expiry-tracking",
+              "alerts/notifications"
+            ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              "integrations/cloudflare",
+              "integrations/vercel",
+              "integrations/github"
+            ]
+          },
+          {
+            "group": "Help",
+            "pages": [
+              "faq",
+              "troubleshooting"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Automatic infrastructure discovery via domain seed (WHOIS + DNS)",
+    "Client-side .env parsing — secrets never leave the browser",
+    "OAuth integrations with Cloudflare, Vercel, and GitHub for live sync",
+    "Manual service entry for full control over your stack",
+    "Interactive React Flow graph with custom service cards, zoom, pan, and minimap",
+    "Domain and SSL certificate expiry tracking with alerts",
+    "Background DNS/WHOIS/SSL polling via queue workers",
+    "Project-scoped infrastructure topology with relationship edges"
+  ],
+  "publicApiSurface": [
+    "POST /api/projects — create a new project",
+    "GET /api/projects/{id} — fetch project details and graph",
+    "POST /api/projects/{id}/discover — trigger domain-based auto-discovery",
+    "POST /api/projects/{id}/services — add a service node manually",
+    "DELETE /api/projects/{id}/services/{serviceId} — remove a service node",
+    "GET /api/projects/{id}/services — list all service nodes for a project",
+    "POST /api/auth/login — authenticate with email/password",
+    "POST /api/auth/logout — end the current session",
+    "GET /api/auth/oauth/{provider} — initiate OAuth flow (cloudflare, vercel, github)",
+    "GET /api/alerts — list active expiry alerts",
+    "PATCH /api/alerts/{id}/dismiss — dismiss an alert"
+  ]
+}

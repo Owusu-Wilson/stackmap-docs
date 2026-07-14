@@ -1,0 +1,88 @@
+---
+title: "Manually Add Any Service or Tool to Your StackMap Graph"
+sidebarTitle: "Manual Entry"
+description: "Add internal tools, proprietary services, or any provider that automated scanning can't detect — directly into your infrastructure graph."
+---
+
+Not every service leaves a DNS footprint or uses a standard environment variable key. Internal dashboards, self-hosted tools, third-party SaaS products accessed only through a web UI, and custom APIs won't surface through domain discovery or `.env` import. Manual entry gives you a direct way to add any service to your graph, keeping your infrastructure map complete and accurate.
+
+## When to use manual entry
+
+Use manual entry for services that fall into any of these categories:
+
+- **Internal tools** — admin panels, internal APIs, self-hosted databases, or homegrown services running on private infrastructure
+- **Third-party SaaS with no public DNS footprint** — tools you log into via a browser but that don't receive traffic from your app's domain
+- **Services from edge cases in automated scanning** — providers whose DNS records or environment variable keys don't match StackMap's fingerprint patterns
+- **Supplementing automated results** — adding metadata, account IDs, or notes to services that were partially detected but need more context
+
+<Tip>
+  Combine manual entry with domain discovery and `.env` import for full coverage. Run both automated methods first, then use manual entry to fill in anything that didn't appear. This hybrid approach keeps manual work to a minimum.
+</Tip>
+
+## Add a service manually
+
+<Steps>
+  <Step title="Open your project">
+    Navigate to the relevant project from the StackMap dashboard.
+  </Step>
+  <Step title="Open the Add Service panel">
+    Click **Add Service** in the top-right of the graph view. The service entry panel slides open on the right.
+  </Step>
+  <Step title="Choose a provider type">
+    Select the provider from the searchable dropdown list. If the exact provider isn't listed, choose the closest category (e.g. **Generic Database**, **Generic API**, or **Internal Tool**) and name it yourself.
+  </Step>
+  <Step title="Fill in the service details">
+    Complete the fields that are relevant to this service:
+    - **Name** — a human-readable label that appears on the graph node (required)
+    - **Account / Identifier** — an account ID, project ID, or URL that scopes which instance of the provider this is (optional but recommended)
+    - **Notes** — free-text field for anything useful to your team, such as who owns the service or what it's used for (optional)
+  </Step>
+  <Step title="Save">
+    Click **Save Service**. The node appears in your graph immediately, linked to the project root.
+  </Step>
+</Steps>
+
+## Edit a service
+
+To update a service's details after adding it:
+
+1. Click the service's node in the graph to open the detail panel.
+2. Click **Edit** in the top-right of the panel.
+3. Update any fields and click **Save Changes**.
+
+## Remove a service
+
+To remove a service from your graph:
+
+1. Click the service's node to open the detail panel.
+2. Click **Edit**, then scroll to the bottom of the panel.
+3. Click **Remove Service** and confirm the prompt.
+
+<Warning>
+  Removing a service deletes it from your graph permanently. If the service was added via domain discovery or `.env` import, you can re-run either method to add it back. Manually entered services must be re-entered by hand.
+</Warning>
+
+## Add a service via the API
+
+You can also add services programmatically using the StackMap REST API — useful when scripting project setup or importing a list of services in bulk.
+
+```bash
+curl -X POST https://app.stackmap.io/api/projects/{id}/services \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Internal Payments API",
+    "provider_type": "generic_api",
+    "identifier": "https://payments.internal.acme.com",
+    "notes": "Owned by the payments team. Handles checkout and refunds."
+  }'
+```
+
+To retrieve all services currently on a project, use:
+
+```bash
+curl https://app.stackmap.io/api/projects/{id}/services \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+Both endpoints return JSON. Replace `{id}` with your project's ID, which you can find in the StackMap dashboard URL or via `POST /api/projects` when creating a project.

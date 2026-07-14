@@ -1,0 +1,57 @@
+---
+title: "StackMap Infrastructure Graph: Overview and Concepts"
+sidebarTitle: "Overview"
+description: "Understand how StackMap visualizes your entire infrastructure as a live, interactive node graph — and what each element on the canvas represents."
+---
+
+The Graph is the central workspace in StackMap. It renders your application's infrastructure topology as an interactive node graph, giving you a real-time picture of every service your app depends on and how those services relate to each other. Whether you're onboarding a new team member, debugging an outage, or planning a migration, the Graph lets you see the full picture at a glance.
+
+## What the Graph displays
+
+Every element on the canvas maps to something real in your infrastructure:
+
+- **Service nodes** represent individual services — a DNS provider, an SSL certificate, a database, a payment processor, and so on. Each node is a card that shows the provider logo, service type, account or zone name, current status, and expiry date where applicable.
+- **Relationship edges** are the lines connecting nodes. An edge from node A to node B means that A depends on B. For example, your hosting service might depend on your DNS configuration, and your DNS configuration might depend on your domain registrar.
+
+Together, nodes and edges form a dependency map that reflects the true shape of your stack.
+
+## How the Graph is populated
+
+StackMap builds your graph from three sources:
+
+- **Automatic discovery** — StackMap scans connected accounts and detects services, credentials, and relationships without manual input.
+- **.env file import** — Paste or upload a `.env` file and StackMap parses the variables to identify services and pre-populate nodes.
+- **Manual entry** — Add any service node by hand and draw edges between existing nodes to capture relationships that discovery can't detect automatically.
+
+You can combine all three approaches. Most teams start with an import or discovery pass, then refine the graph manually to fill in gaps.
+
+## Status color coding
+
+Every node carries a status badge that reflects the current health of that service. The color scheme is consistent across the entire Graph:
+
+<CardGroup cols={3}>
+  <Card title="Healthy" icon="circle-check" iconType="solid" color="#22c55e">
+    Green — the service is active and no issues have been detected.
+  </Card>
+  <Card title="Expiry Warning" icon="circle-exclamation" iconType="solid" color="#f97316">
+    Orange — the service has a tracked expiry date that falls within the next 30 days.
+  </Card>
+  <Card title="Critical or Expired" icon="circle-xmark" iconType="solid" color="#ef4444">
+    Red — the service expires within 7 days, has already expired, or StackMap detected an error.
+  </Card>
+</CardGroup>
+
+<Note>
+  Status is refreshed automatically each time StackMap runs a discovery scan. You can also trigger a manual refresh from the Graph toolbar.
+</Note>
+
+## Explore further
+
+<CardGroup cols={2}>
+  <Card title="Service Nodes" icon="layer-group" href="/graph/service-nodes">
+    Learn what each node card shows, how to edit service details, and how to manage relationships between nodes.
+  </Card>
+  <Card title="Navigating the Graph" icon="compass" href="/graph/navigating">
+    Learn how to zoom, pan, rearrange nodes, use the minimap, and work efficiently on large graphs.
+  </Card>
+</CardGroup>

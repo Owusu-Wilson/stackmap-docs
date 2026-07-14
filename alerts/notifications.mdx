@@ -1,0 +1,175 @@
+---
+title: "Expiry Alert Notifications and the StackMap Alerts Panel"
+sidebarTitle: "Notifications"
+description: "Discover how to use the StackMap Alerts panel to review, prioritize, and dismiss active expiry alerts across all your monitored services."
+---
+
+The StackMap Alerts panel gives you a single, consolidated view of every active expiry alert in your project. Instead of hunting through individual service nodes in the graph, you can open the Alerts panel to instantly see which domains and SSL certificates need attention, ranked by how urgent they are.
+
+## Finding the Alerts Panel
+
+The Alerts panel is accessible from your project dashboard. Look for the **Alerts** tab in the main navigation sidebar. A badge on the tab shows the count of active alerts — if the badge is absent, all tracked services are currently in a Healthy state.
+
+Clicking the tab opens the full alert list. The panel is always scoped to your current project; if you work across multiple projects, you can switch projects using the project selector at the top of the dashboard.
+
+## What Each Alert Shows
+
+Every alert in the panel surfaces the following fields at a glance:
+
+| Field | Description |
+|---|---|
+| **Service name** | The name of the affected service node as it appears in your graph |
+| **Type** | Whether the alert relates to a **Domain** registration or an **SSL** certificate |
+| **Expiry date** | The exact date the domain or certificate is due to expire |
+| **Days remaining** | A live countdown to expiry, updated on each background scan |
+| **Urgency** | The current expiry status — Warning, Critical, or Expired |
+
+Alerts are sorted by urgency by default, with **Expired** and **Critical** items at the top, followed by **Warning** items. Within each urgency tier, alerts are further sorted by days remaining in ascending order so the most time-sensitive items always surface first.
+
+<Info>
+  Email notifications for expiry alerts are coming in a future update. For now, the Alerts panel is your primary place to stay on top of upcoming renewals — check it regularly to make sure nothing slips through.
+</Info>
+
+## Dismissing an Alert
+
+Once you have renewed a domain or certificate, or otherwise acknowledged an alert, you can dismiss it to keep the panel clean. Dismissing an alert marks it as acknowledged without removing it from StackMap's tracking — if the underlying expiry date does not change (because the renewal hasn't been picked up yet), the alert will reappear on the next scan.
+
+<Steps>
+  <Step title="Locate the alert">
+    Find the alert you want to dismiss in the Alerts panel. Use the urgency sort or the search bar to narrow down a long list.
+  </Step>
+  <Step title="Open the alert actions">
+    Hover over the alert row to reveal the action buttons on the right-hand side.
+  </Step>
+  <Step title="Click Dismiss">
+    Select **Dismiss** to mark the alert as acknowledged. The alert is removed from your active list immediately.
+  </Step>
+</Steps>
+
+<Note>
+  Dismissing an alert is an acknowledgment action, not a fix. If the service expiry date has not been updated at the source by the next scan, StackMap will surface the alert again automatically.
+</Note>
+
+## Jumping to a Node in the Graph
+
+Each alert links directly back to the relevant service node so you can inspect it in context without manually searching the graph.
+
+To navigate from an alert to its node, hover over the alert row and click **View in graph**. StackMap will open the graph view, center the viewport on the affected service node, and open its detail card — giving you immediate access to full expiry details, connected dependencies, and the manual rescan option.
+
+## Filtering and Sorting Alerts
+
+The Alerts panel gives you several options to focus on what matters most:
+
+**Sort by urgency** (default) — keeps the most time-sensitive alerts at the top of the list. This is the recommended view for daily triage.
+
+**Sort by days remaining** — lists all alerts in ascending order by the days-remaining countdown, useful when you want a linear view of your upcoming renewal timeline regardless of urgency tier.
+
+**Filter by type** — use the **Domain** / **SSL** toggle to isolate one category of alert, helpful if you manage renewals in separate workflows (e.g., your registrar and your certificate authority).
+
+**Filter by project** — if your StackMap account includes multiple projects, use the project selector at the top of the dashboard to switch context. The Alerts panel always shows alerts for the active project only.
+
+## Querying Alerts Programmatically
+
+If you want to pull active expiry alerts into your own dashboards, scripts, or on-call tooling, StackMap exposes two API endpoints for working with alerts directly.
+
+### GET /api/alerts
+
+Returns all active expiry alerts for the authenticated project, in the same urgency-sorted order shown in the Alerts panel.
+
+<CodeGroup>
+```http Request
+GET /api/alerts HTTP/1.1
+Authorization: Bearer <your-api-token>
+```
+
+```json Response
+[
+  {
+    "id": "alrt_01hxyz1234abcd",
+    "service_name": "api.example.com",
+    "type": "ssl",
+    "expiry_date": "2025-03-14",
+    "days_remaining": 6,
+    "status": "critical"
+  },
+  {
+    "id": "alrt_01hxyz5678efgh",
+    "service_name": "example.com",
+    "type": "domain",
+    "expiry_date": "2025-04-02",
+    "days_remaining": 25,
+    "status": "warning"
+  }
+]
+```
+</CodeGroup>
+
+<ResponseField name="id" type="string">
+  Unique identifier for the alert. Used when dismissing via the API.
+</ResponseField>
+
+<ResponseField name="service_name" type="string">
+  The name of the affected service node as it appears in your graph.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  Either `domain` (domain registration) or `ssl` (SSL/TLS certificate).
+</ResponseField>
+
+<ResponseField name="expiry_date" type="string">
+  ISO 8601 date string representing the exact expiry date.
+</ResponseField>
+
+<ResponseField name="days_remaining" type="integer">
+  Number of whole days until expiry at the time of the last scan. Negative values indicate the service has already expired.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  One of `warning` (≤ 30 days), `critical` (≤ 7 days), or `expired`.
+</ResponseField>
+
+### PATCH /api/alerts/{id}/dismiss
+
+Dismisses a specific alert by ID, marking it as acknowledged. This mirrors the **Dismiss** action in the Alerts panel UI. If the underlying expiry date has not changed by the next scan, the alert will reappear automatically.
+
+<CodeGroup>
+```http Request
+PATCH /api/alerts/alrt_01hxyz1234abcd/dismiss HTTP/1.1
+Authorization: Bearer <your-api-token>
+```
+
+```json Response
+{
+  "id": "alrt_01hxyz1234abcd",
+  "dismissed": true,
+  "dismissed_at": "2025-03-08T14:32:00Z"
+}
+```
+</CodeGroup>
+
+<ResponseField name="id" type="string">
+  The ID of the alert that was dismissed.
+</ResponseField>
+
+<ResponseField name="dismissed" type="boolean">
+  Confirms the alert has been marked as acknowledged. Always `true` on success.
+</ResponseField>
+
+<ResponseField name="dismissed_at" type="string">
+  ISO 8601 timestamp of when the dismissal was recorded.
+</ResponseField>
+
+<Note>
+  Both endpoints require a valid API token passed as a `Bearer` token in the `Authorization` header. You can generate and manage API tokens from your account settings.
+</Note>
+
+## Best Practices
+
+<Tip>
+  Build a habit of opening the Alerts panel at the start of each week. A quick scan takes seconds and ensures no renewal sneaks up on you between automated reminders.
+</Tip>
+
+- **Check the Alerts panel regularly.** Since email notifications are not yet available, the panel is your main early-warning system. A weekly review is a good minimum cadence.
+- **Set calendar reminders for critical services.** For any domain or certificate that would cause a significant outage if it expired, set a calendar event 30 days before its expiry date as a personal backstop alongside StackMap's Warning threshold.
+- **Renew early.** Most registrars and certificate authorities let you renew well before the expiry date without losing the remaining term. Renewing when a service first enters Warning state (≤ 30 days) gives you ample time to resolve any complications before it becomes critical.
+- **Verify renewals in StackMap.** After completing a renewal, use the **Refresh** option on the service node card to trigger an on-demand scan and confirm that StackMap has picked up the updated expiry date. This closes the loop and clears the alert.

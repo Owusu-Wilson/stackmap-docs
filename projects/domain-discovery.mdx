@@ -1,0 +1,84 @@
+---
+title: "Discover Your Infrastructure with Automated Domain Scan"
+sidebarTitle: "Domain Discovery"
+description: "Automatically identify every provider your app depends on — DNS records, SSL certificates, hosting and more — by scanning your domain."
+---
+
+Domain discovery is the fastest way to populate your StackMap project. Enter your app's public domain and StackMap kicks off a background scan that runs WHOIS lookups, queries every major DNS record type (A, AAAA, MX, CNAME, TXT, and NS), and inspects your SSL certificate chain. It then matches each finding against its fingerprint database to identify the real-world providers behind those records — pinpointing things like Cloudflare for DNS, AWS for compute, and Stripe for payments — and adds them as nodes in your live infrastructure graph automatically.
+
+## How discovery works
+
+StackMap performs the following checks when you trigger a scan:
+
+- **WHOIS lookup** — retrieves registrar, registration dates, and nameserver details for the domain
+- **DNS records** — queries A, AAAA, MX, CNAME, TXT, and NS record sets to surface hosting providers, mail services, and verification tokens
+- **SSL certificate inspection** — reads the certificate chain to identify CDN providers, load balancers, and certificate authorities
+- **Fingerprint matching** — each discovered record is compared against StackMap's provider fingerprint database to map raw IPs and hostnames to named services
+
+<Note>
+  Discovery runs as a background job. Depending on DNS propagation and the number of records on your domain, it may take one to two minutes for all results to appear in your graph. Refresh the graph view if you don't see results immediately.
+</Note>
+
+## Run a domain discovery scan
+
+<Steps>
+  <Step title="Create a new project">
+    From the StackMap dashboard, click **New Project**, give it a name, and click **Create**.
+  </Step>
+  <Step title="Enter your domain">
+    On the project setup screen, type your app's root domain into the **Domain** field (e.g. `acme.com`). You do not need to include `https://` or any path.
+  </Step>
+  <Step title="Trigger discovery">
+    Click **Run Discovery**. StackMap queues a background scan and returns you to the project graph immediately.
+  </Step>
+  <Step title="Review the results">
+    Watch the graph populate as discovered services come in. Each detected provider appears as a node with its category label (DNS, Hosting, Email, Payments, etc.) and a confidence indicator. Click any node to see the raw records that triggered the match.
+  </Step>
+</Steps>
+
+## What the results look like
+
+Each successfully identified provider becomes a labelled node in your infrastructure graph. Nodes are grouped by category and linked to your root domain node, so you can see the shape of your stack at a glance. Clicking a node opens a side panel with:
+
+- The matched provider name and logo
+- The specific DNS records or certificate fields that triggered the match
+- Any expiry dates detected (e.g. SSL expiry, domain registration expiry)
+
+## Trigger a scan via the API
+
+If you want to kick off discovery programmatically — for example as part of a project setup script — you can use the StackMap REST API directly.
+
+**Step 1:** Create a project and note the returned project `id`.
+
+```bash
+curl -X POST https://app.stackmap.io/api/projects \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Acme Production", "domain": "acme.com"}'
+```
+
+**Step 2:** Trigger discovery for that project.
+
+```bash
+curl -X POST https://app.stackmap.io/api/projects/{id}/discover \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+StackMap will queue the scan and process it as a background job, just as it does when triggered from the dashboard. Poll `GET /api/projects/{id}/services` to check for results once the scan completes.
+
+## Filling in the gaps
+
+Domain discovery is comprehensive but not exhaustive. Internal services, third-party SaaS tools with no public DNS footprint, and credentials stored only in environment variables won't appear in a DNS scan. If your graph looks incomplete after discovery finishes, use either of these approaches to round it out:
+
+<CardGroup cols={2}>
+  <Card title=".env Import" icon="file-lines" href="/projects/env-import">
+    Upload or paste your `.env` file to detect providers from your environment variable key names — securely, in the browser.
+  </Card>
+  <Card title="Manual Entry" icon="plus" href="/projects/manual-entry">
+    Add any service by hand — ideal for internal tools, SaaS dashboards, or anything with no public DNS record.
+  </Card>
+</CardGroup>
+
+<Tip>
+  Run discovery first, then layer in `.env` import and manual entry. This three-pass approach gives you the most complete graph with the least effort.
+</Tip>

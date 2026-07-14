@@ -1,0 +1,77 @@
+---
+title: "Cloudflare Integration — StackMap DNS Record Sync"
+sidebarTitle: "Cloudflare"
+description: "Automatically sync your Cloudflare zones and DNS records into StackMap so your infrastructure graph always reflects live DNS state."
+---
+
+The Cloudflare integration connects your Cloudflare account to StackMap via OAuth and continuously syncs your zones and DNS records into your infrastructure graph. Once connected, StackMap automatically creates and updates DNS and zone service nodes whenever you make changes in Cloudflare — so your graph stays accurate without any manual effort.
+
+<Info>
+  **Coming in Phase 2.** The Cloudflare integration is not yet available. This page describes what will be possible once it launches so you can plan ahead. In the meantime, see [Domain Discovery](/projects/domain-discovery) to capture DNS information today.
+</Info>
+
+## What the Cloudflare integration does
+
+When you connect Cloudflare, StackMap reads your account's zones and associated DNS records and maps them as live nodes in your graph. Every time a record changes in Cloudflare, StackMap reflects that change automatically. This gives you a single place to see how your DNS layer connects to the rest of your infrastructure — load balancers, origin servers, mail providers, and more.
+
+## How to connect
+
+When the Cloudflare integration launches, connecting your account will take just a few steps. Here is what the process will look like.
+
+<Steps>
+  <Step title="Open Integration Settings">
+    Navigate to **Settings → Integrations** in your StackMap workspace.
+  </Step>
+  <Step title="Select Cloudflare">
+    Find the Cloudflare card and click **Connect**.
+  </Step>
+  <Step title="Authorize via OAuth">
+    You will be redirected to Cloudflare's authorization page. Sign in with the Cloudflare account you want to connect and grant StackMap read access to your zones and DNS records.
+  </Step>
+  <Step title="Choose zones to sync">
+    After authorization, select which zones you want StackMap to track. You can include all zones or pick a subset.
+  </Step>
+  <Step title="Confirm and sync">
+    Click **Save**. StackMap will perform an initial sync and add zone and DNS nodes to your graph within a few seconds.
+  </Step>
+</Steps>
+
+## What gets synced
+
+StackMap will import the following data from Cloudflare:
+
+| Data type | Details |
+|---|---|
+| **Zones** | Zone name, status, and account association |
+| **DNS records** | A, AAAA, CNAME, MX, and TXT records — including name, value, TTL, and proxy status |
+
+<Note>
+  StackMap requests read-only access to your Cloudflare account. It cannot create, modify, or delete any zones or DNS records on your behalf.
+</Note>
+
+## How sync works
+
+StackMap will keep your graph up to date in two ways:
+
+- **On-demand sync** — Trigger a manual sync at any time from the Cloudflare integration card in **Settings → Integrations**.
+- **Periodic background sync** — StackMap automatically polls your Cloudflare account in the background to pick up changes, so nodes stay current even if you forget to trigger a manual sync.
+
+<Tip>
+  After making DNS changes in Cloudflare, use on-demand sync to see them reflected in your graph immediately rather than waiting for the next background sync.
+</Tip>
+
+## How to disconnect
+
+To remove the Cloudflare integration, go to **Settings → Integrations**, find the Cloudflare card, and click **Disconnect**. StackMap will stop syncing and revoke its OAuth access token. Existing Cloudflare nodes in your graph will remain but will no longer update automatically — you can delete them manually if needed.
+
+<Warning>
+  Disconnecting does not delete any nodes already in your graph. Remove them manually from your project if you no longer need them.
+</Warning>
+
+## In the meantime
+
+While the Cloudflare integration is in development, you can capture DNS and domain information using **Domain Discovery**. StackMap scans your domains and automatically identifies DNS records and linked services — no Cloudflare connection required.
+
+<Card title="Domain Discovery" href="/projects/domain-discovery">
+  Discover DNS records and linked services from any domain you own.
+</Card>

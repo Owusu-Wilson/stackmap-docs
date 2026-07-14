@@ -1,0 +1,81 @@
+---
+title: "Domain & SSL Certificate Expiry Tracking in StackMap"
+sidebarTitle: "Expiry Tracking"
+description: "Learn how StackMap monitors domain registration and SSL certificate expiry dates, what each status means, and how to act before a service lapses."
+---
+
+StackMap continuously tracks the expiry dates of every domain registration and SSL/TLS certificate it discovers in your infrastructure graph. When a service is approaching its expiry window — or has already lapsed — StackMap surfaces a color-coded alert so you can act before anything goes down.
+
+## What StackMap Tracks
+
+StackMap monitors two categories of expiry for each service node in your graph:
+
+- **Domain registration expiry** — pulled from WHOIS records for every domain StackMap discovers. This tells you when the domain registration is due for renewal with your registrar.
+- **SSL/TLS certificate expiry** — polled directly from the certificate presented by each service endpoint. This captures the `Not After` date from the certificate chain.
+
+Both are tracked independently, so a service can be healthy on one dimension and critical on another.
+
+## How Tracking Works
+
+StackMap runs background polling jobs that periodically re-check WHOIS records and certificate endpoints for every service in your graph. Each scan updates the stored expiry date automatically — no manual intervention required. As soon as a renewal is detected at the source (registrar or certificate authority), StackMap picks up the new date on the next scheduled scan and updates the node's status accordingly.
+
+<Note>
+  StackMap does not renew domain registrations or SSL certificates on your behalf. It only tracks expiry dates and surfaces alerts — all renewals must be completed directly with your domain registrar or certificate authority.
+</Note>
+
+## Expiry Status Reference
+
+Each tracked service is assigned one of four expiry statuses based on how many days remain until expiry. These statuses are reflected as color-coded indicators on the service node card in your graph.
+
+| Status | Threshold | Graph Color |
+|---|---|---|
+| Healthy | > 30 days remaining | Green |
+| Warning | ≤ 30 days remaining | Orange |
+| Critical | ≤ 7 days remaining | Red |
+| Expired | 0 days / past expiry | Red (pulsing) |
+
+<Tip>
+  The pulsing red indicator on an expired node makes it easy to spot lapsed services at a glance, even in a large, busy graph.
+</Tip>
+
+## Where to See Expiry Information
+
+StackMap surfaces expiry data in two places:
+
+**Service node card in the graph** — hover over or select any service node to open its detail card. The card displays the domain and SSL expiry dates alongside the current status badge, color-coded to match the table above.
+
+**Alerts panel on the dashboard** — the Alerts panel aggregates every active expiry alert across your project in one place, sorted by urgency. Use this view to get a full picture of what needs attention without clicking through individual nodes. See [Notifications & Alerts](/alerts/notifications) for details on working with the Alerts panel.
+
+## What to Do When a Service Is Expiring
+
+When you see a Warning, Critical, or Expired status on a node, take the following steps:
+
+<Steps>
+  <Step title="Identify the service">
+    Open the service node card in the graph or find the alert in the Alerts panel to confirm the service name, expiry type (domain or SSL), and the exact expiry date.
+  </Step>
+  <Step title="Renew with your provider">
+    Log in to the relevant domain registrar or certificate authority and complete the renewal. For SSL certificates, this may involve reissuing the certificate and redeploying it to your server or load balancer.
+  </Step>
+  <Step title="Wait for the next scan">
+    Once renewal is complete, StackMap will detect the updated expiry date on its next background scan. The node's status will automatically return to **Healthy** and any associated alerts will clear.
+  </Step>
+</Steps>
+
+<Warning>
+  If a domain or certificate has already reached **Expired** status, services depending on it may be actively degraded or unreachable. Prioritize renewals for expired and critical-status nodes immediately.
+</Warning>
+
+## Frequently Asked Questions
+
+<Accordion title="How often does StackMap poll for updated expiry dates?">
+  StackMap's background jobs run periodic scans across all service nodes in your graph. The exact polling interval depends on your plan tier. After renewing a certificate or domain, the updated date will be reflected in StackMap within the next scheduled scan cycle.
+</Accordion>
+
+<Accordion title="Can I manually trigger a rescan after renewing a service?">
+  Yes. From the service node card in the graph, use the **Refresh** option to trigger an on-demand scan for that specific node. This lets you confirm the renewal was picked up without waiting for the next scheduled poll.
+</Accordion>
+
+<Accordion title="Does StackMap track wildcard or multi-domain (SAN) certificates?">
+  Yes. StackMap reads the full certificate presented by each endpoint, including wildcard and SAN certificates. Each unique certificate is tracked as a single entry; the expiry date reflects the certificate's `Not After` field regardless of how many domains it covers.
+</Accordion>

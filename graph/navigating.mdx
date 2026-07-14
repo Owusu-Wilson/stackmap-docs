@@ -1,0 +1,88 @@
+---
+title: "Navigating the Graph Canvas: Zoom, Pan, and Layout"
+sidebarTitle: "Navigating"
+description: "Learn how to move around the StackMap graph canvas — zoom, pan, rearrange nodes, use the minimap, and reset your layout with a single click."
+---
+
+The Graph canvas is built for large, complex infrastructure maps. Once your graph grows beyond a handful of nodes, knowing how to navigate efficiently makes the difference between a frustrating experience and a smooth one. This page covers every way to move around the canvas, rearrange your layout, and stay oriented.
+
+## Zooming
+
+You can zoom in and out using any of these methods:
+
+- **Scroll wheel** — Roll the scroll wheel up to zoom in, down to zoom out. Works anywhere on the canvas background.
+- **Pinch gesture** — On a trackpad or touchscreen, pinch two fingers together to zoom out, spread them apart to zoom in.
+- **Zoom controls** — Use the **+** and **–** buttons in the toolbar (bottom-left of the canvas) for precise, step-by-step zooming.
+- **Keyboard shortcut** — Hold **Ctrl** (Windows/Linux) or **Cmd** (macOS) and scroll the mouse wheel to zoom.
+
+<Tip>
+  Double-click a node to zoom directly to it and center it in the viewport — useful when you know which service you want to inspect but can't find it on a busy canvas.
+</Tip>
+
+## Panning
+
+To move across the canvas without changing the zoom level, click and drag on any empty area of the canvas background. Your cursor changes to a grab hand to confirm you're dragging the canvas rather than a node.
+
+<Note>
+  Clicking and dragging on a node card moves the node itself, not the canvas. To pan, make sure you click on the background between nodes.
+</Note>
+
+## Selecting nodes
+
+You can select nodes to act on them individually or as a group:
+
+- **Single select** — Click a node to select it and open its detail panel.
+- **Multi-select** — Hold **Shift** and click additional nodes to add them to your selection. Selected nodes are highlighted with an outline.
+- **Select all** — Press **Ctrl+A** (Windows/Linux) or **Cmd+A** (macOS) to select every node on the canvas at once.
+
+With multiple nodes selected, you can drag them as a group to reposition them together, or press **Delete** to remove them all at once.
+
+<Warning>
+  Pressing **Delete** with multiple nodes selected removes all selected nodes and their connected edges. Confirm your selection before deleting.
+</Warning>
+
+## Dragging nodes to rearrange
+
+Click and drag any node card to move it to a new position on the canvas. Your custom positions are saved automatically — StackMap remembers your layout between sessions.
+
+Rearranging nodes is useful for:
+
+- Grouping related services together visually (for example, all DNS and SSL nodes in one cluster)
+- Reducing edge crossings to make the dependency flow easier to read
+- Making room for newly added nodes
+
+## Auto-layout
+
+If your graph becomes cluttered or you want to start fresh with positioning, click the **Auto-layout** button in the Graph toolbar. StackMap recalculates node positions using an automatic layout algorithm that minimizes edge crossings and groups connected nodes.
+
+<Note>
+  Auto-layout overwrites any manual positioning you have done. If you want to preserve your current layout, note your arrangement before clicking — there is no undo for a layout reset.
+</Note>
+
+## The minimap
+
+The minimap is a small overview panel in the bottom-right corner of the canvas. It shows a bird's-eye view of your entire graph, with a shaded rectangle indicating the portion currently visible in your viewport.
+
+You can interact with the minimap in two ways:
+
+- **Click** anywhere on the minimap to jump the viewport to that area of the graph.
+- **Drag** the shaded viewport rectangle on the minimap to pan the canvas smoothly.
+
+To toggle the minimap on or off, click the **Minimap** button in the Graph toolbar.
+
+<Tip>
+  On large projects with dozens of nodes, keep the minimap open. It's the fastest way to jump between clusters of services — especially when you're chasing a dependency chain across a sprawling graph.
+</Tip>
+
+## Keyboard shortcuts reference
+
+| Action | Windows / Linux | macOS |
+|---|---|---|
+| Zoom in / out | Ctrl + Scroll | Cmd + Scroll |
+| Select all nodes | Ctrl + A | Cmd + A |
+| Delete selected node(s) | Delete | Delete |
+| Multi-select (add to selection) | Shift + Click | Shift + Click |
+
+<Info>
+  Keyboard shortcuts are active whenever the Graph canvas has focus. If a shortcut isn't responding, click once on the canvas background to give it focus, then try again.
+</Info>

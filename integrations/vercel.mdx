@@ -1,0 +1,85 @@
+---
+title: "Vercel Integration — StackMap Deployment Project Sync"
+sidebarTitle: "Vercel"
+description: "Sync your Vercel projects and deployment URLs into StackMap and automatically link frontend deployments to the services they depend on."
+---
+
+The Vercel integration connects your Vercel account to StackMap via OAuth and syncs your projects and deployment information into your infrastructure graph. Once connected, StackMap adds Vercel project nodes and automatically links them to the databases, APIs, and domains they interact with — giving you a complete picture of your frontend-to-backend relationships.
+
+<Info>
+  **Coming in Phase 2.** The Vercel integration is not yet available. This page describes what will be possible once it launches so you can plan ahead. In the meantime, see [.env Import](/projects/env-import) or [Manual Entry](/projects/manual-entry) to add Vercel projects to your graph today.
+</Info>
+
+## What the Vercel integration does
+
+When you connect Vercel, StackMap reads your projects and their latest deployment data and maps them as nodes in your graph. StackMap then analyzes the deployment URLs and environment variable key names to infer connections to other services already in your graph — for example, linking a Vercel project to a database or an external API it calls. As you deploy new versions or update projects in Vercel, StackMap keeps those nodes current.
+
+## How to connect
+
+When the Vercel integration launches, connecting your account will take just a few steps. Here is what the process will look like.
+
+<Steps>
+  <Step title="Open Integration Settings">
+    Navigate to **Settings → Integrations** in your StackMap workspace.
+  </Step>
+  <Step title="Select Vercel">
+    Find the Vercel card and click **Connect**.
+  </Step>
+  <Step title="Authorize via OAuth">
+    You will be redirected to Vercel's authorization page. Sign in with the Vercel account you want to connect and grant StackMap access to your projects.
+  </Step>
+  <Step title="Choose a scope">
+    Select whether to sync projects from your personal account, a specific team, or all accessible teams.
+  </Step>
+  <Step title="Confirm and sync">
+    Click **Save**. StackMap will perform an initial sync and add your Vercel project nodes to your graph within a few seconds.
+  </Step>
+</Steps>
+
+## What gets synced
+
+StackMap will import the following data from Vercel:
+
+| Data type | Details |
+|---|---|
+| **Project names** | The name of each Vercel project in the selected scope |
+| **Deployment URLs** | The latest production deployment URL and any active preview URLs |
+| **Framework detected** | The framework Vercel identified for the project (e.g. Next.js, Remix, SvelteKit) |
+| **Environment variable key names** | The names of configured environment variables — **not** their values |
+
+<Note>
+  StackMap never reads environment variable values. It only reads key names to infer which services a project is connected to (for example, `DATABASE_URL` suggests a database dependency).
+</Note>
+
+## How StackMap links Vercel projects to other services
+
+After importing your Vercel projects, StackMap scans the deployment URLs and environment variable key names to automatically draw edges between nodes. Common links StackMap infers include:
+
+- **Domain nodes** — A Vercel project with a custom domain gets linked to the matching domain node in your graph.
+- **Database nodes** — Environment variable keys that match known database URL patterns link the project to the corresponding database service.
+- **API nodes** — Keys referencing external API base URLs link the project to those API nodes.
+
+<Tip>
+  The more completely you have mapped your other services (databases, APIs, domains), the more connection edges StackMap will be able to draw automatically for your Vercel projects.
+</Tip>
+
+## How to disconnect
+
+To remove the Vercel integration, go to **Settings → Integrations**, find the Vercel card, and click **Disconnect**. StackMap will stop syncing and revoke its OAuth access token. Existing Vercel project nodes in your graph will remain but will no longer update automatically — you can delete them manually if needed.
+
+<Warning>
+  Disconnecting does not delete any nodes already in your graph. Remove them manually from your project if you no longer need them.
+</Warning>
+
+## In the meantime
+
+While the Vercel integration is in development, you have two options for adding Vercel project information to your graph:
+
+<CardGroup cols={2}>
+  <Card title=".env Import" href="/projects/env-import">
+    Import your Vercel project's environment variables to let StackMap infer service connections automatically.
+  </Card>
+  <Card title="Manual Entry" href="/projects/manual-entry">
+    Add a Vercel project node by hand and connect it to other services in your graph.
+  </Card>
+</CardGroup>

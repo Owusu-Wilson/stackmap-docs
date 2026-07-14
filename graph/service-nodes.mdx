@@ -1,0 +1,133 @@
+---
+title: "Service Nodes: View, Edit, and Manage Infrastructure Cards"
+sidebarTitle: "Service Nodes"
+description: "Explore what each service node card displays, how to open the detail panel, edit service info, and manage edges between nodes on your graph."
+---
+
+Each service in your infrastructure is represented on the Graph as a node card. Node cards are designed to give you the most relevant information about a service at a glance, without needing to open anything. When you do need more detail or want to make a change, a single click takes you deeper.
+
+## What a node card shows
+
+Every node card displays the following fields:
+
+- **Provider logo** — The recognizable icon for the service provider (for example, the Cloudflare or Stripe logo), so you can identify services instantly without reading labels.
+- **Service type** — A label describing the category of the service, such as DNS, SSL, Hosting, or Database.
+- **Account or zone name** — The specific account, project, or zone associated with this service. For a DNS provider, this is typically the zone name; for a hosting provider, it's the project or team name.
+- **Status badge** — A color-coded pill showing the current health of the service. See [Status meanings](#status-meanings) below.
+- **Expiry date** — Shown only when StackMap is tracking an expiry for that service (for example, SSL certificates or domain registrations).
+
+## Supported service types
+
+StackMap recognizes the following service categories. The provider list is not exhaustive — you can add any provider manually.
+
+| Service Type | Example Providers |
+|---|---|
+| DNS | Cloudflare, Route 53, Namecheap |
+| SSL | Let's Encrypt, Sectigo, DigiCert |
+| Hosting | Vercel, Netlify, Fly.io, AWS |
+| Database | PlanetScale, Supabase, Neon |
+| Payment | Stripe, Paddle |
+| Source Control | GitHub, GitLab |
+| Email | Mailgun, Postmark, SendGrid |
+
+## Status meanings
+
+The status badge on each node card uses a consistent color scheme:
+
+- 🟢 **Healthy** — The service is active and no issues were detected during the last scan.
+- 🟠 **Expiry warning** — The service has a tracked expiry date within the next 30 days. Take action before it lapses.
+- 🔴 **Critical or expired** — The service expires within the next 7 days, has already passed its expiry date, or StackMap encountered an error when checking this service.
+
+<Warning>
+  A red status on a node that other nodes depend on can indicate a cascading risk. Check the edges leading away from that node to understand which downstream services may be affected.
+</Warning>
+
+## Opening the detail panel
+
+Click any node card to open the detail panel on the right side of the canvas. The detail panel shows the full record for that service, including all fields visible on the card plus any notes you've added, connection metadata, and the full list of edges connecting this node to others.
+
+You can edit fields directly from the detail panel without leaving the Graph.
+
+## Editing a service
+
+<Steps>
+  <Step title="Open the detail panel">
+    Click the node card you want to edit. The detail panel slides open on the right.
+  </Step>
+  <Step title="Enter edit mode">
+    Click the **Edit** button in the top-right corner of the detail panel. All editable fields become active inputs.
+  </Step>
+  <Step title="Update the fields">
+    Modify the service name, account or zone name, notes, or any other editable field. Changes are reflected on the node card in real time.
+  </Step>
+  <Step title="Save your changes">
+    Click **Save** to commit. The detail panel returns to read-only view and the node card updates immediately.
+  </Step>
+</Steps>
+
+<Tip>
+  Use the **Notes** field to record anything that doesn't fit a structured field — the name of the team member who owns this service, a link to a runbook, or a reminder about an upcoming renewal.
+</Tip>
+
+## Removing a service node
+
+You can remove a node in two ways:
+
+- **Kebab menu** — Hover over the node card to reveal the three-dot menu (⋮) in the top-right corner of the card. Click it and select **Remove**.
+- **Right-click** — Right-click anywhere on the node card to open the context menu, then select **Remove**.
+
+<Warning>
+  Removing a node also removes all edges connected to it. This action cannot be undone from the Graph — restore the node by re-adding the service manually or re-running discovery.
+</Warning>
+
+## Adding a relationship edge between nodes
+
+Edges can be added manually when discovery doesn't detect a dependency automatically.
+
+<Steps>
+  <Step title="Hover over the source node">
+    Move your cursor to the node that depends on another service. A connection handle (a small dot or circle) appears on the edge of the card.
+  </Step>
+  <Step title="Drag to the target node">
+    Click and drag from the connection handle to the node you want to connect to. A preview line follows your cursor.
+  </Step>
+  <Step title="Release to create the edge">
+    Release over the target node. The edge is created and appears on the canvas immediately.
+  </Step>
+</Steps>
+
+<Note>
+  You can also remove an individual edge without deleting either node. Click the edge line to select it, then press **Delete** or right-click and choose **Remove Edge**.
+</Note>
+
+## Managing service nodes via API
+
+You can list, add, and remove service nodes programmatically using the StackMap REST API. This is useful for scripted imports, CI/CD workflows, or building your own tooling on top of your project data.
+
+**List all service nodes**
+
+```http
+GET /api/projects/{id}/services
+```
+
+Returns all service nodes in the specified project, including their type, status, and metadata.
+
+**Add a service node**
+
+```http
+POST /api/projects/{id}/services
+```
+
+Creates a new service node in the project graph. Pass service type, provider, account name, and optional expiry date in the request body.
+
+**Remove a service node**
+
+```http
+DELETE /api/projects/{id}/services/{serviceId}
+```
+
+Permanently removes the specified service node and all of its connected edges from the graph.
+
+<Note>
+  Replace `{id}` with your project ID and `{serviceId}` with the ID of the node you want to remove. Both values are available in the project and node detail responses.
+</Note>
