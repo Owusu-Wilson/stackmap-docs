@@ -68,7 +68,7 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:support@stackmap.io"
+        "href": "/"
       }
     ],
     "primary": {
@@ -81,5 +81,14 @@
     "socials": {
       "github": "https://github.com/stackmap"
     }
+  },
+  "background": {
+    "decoration": "gradient",
+    "color": {
+      "dark": "#0a0a0a"
+    }
+  },
+  "fonts": {
+    "family": "Figtree"
   }
 }
